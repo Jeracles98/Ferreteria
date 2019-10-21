@@ -54,7 +54,7 @@ public class DB4o {
 			case 5: mostrarArticulos(); break; //Hecho
 			case 6: modificarArticulo(); break;//"HECHO"
 			case 7: reponerArticulo(); break; //Hecho
-			case 8: hacerVenta(); break;
+			case 8: hacerVenta(); break; //Hecho
 			case 9: anularVenta(); break;
 			case 10: articulosAreponer(); break; //"HECHO"
 			case 11: ventasRealizadas(); break;
@@ -106,7 +106,26 @@ public class DB4o {
 
 	private static void hacerVenta() {
 		// A partir de la fecha de hoy, pide dni de cliente, pide artículo y nº unidades quese venden. Hay que descontar el numero de unidades del stock.
-
+		String dni,cod_articulo;
+		int unidadesCompra;
+		System.out.println("Dime el DNI del cliente: ");
+		dni = teclado.next().toUpperCase();
+		ObjectSet<Cliente> resultadoCliente = db.queryByExample(new Cliente(null, dni, null));
+		if (resultadoCliente.isEmpty()) {
+			System.out.println("No existe el cliente con el DNI " + dni);
+		} else {
+			System.out.println("Dime el codigo del articulo ");
+			cod_articulo = teclado.next().toUpperCase();
+			ObjectSet<Articulo> resultadoArticulo = db.queryByExample(new Articulo(null, cod_articulo, 0));
+			if (resultadoArticulo.isEmpty()) {
+				System.out.println("No existe el articulo con el codigo " + cod_articulo);
+			} else {
+				System.out.println("Dime las unidades que quieres comprar ");
+				unidadesCompra = Integer.parseInt(teclado.next());
+				Articulo articulo = resultadoArticulo.next();
+				articulo.setStock_actual(articulo.getStock_actual() - unidadesCompra);
+			}
+		}
 	}
 
 	private static void reponerArticulo() {
