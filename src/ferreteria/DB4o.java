@@ -5,10 +5,8 @@ import java.util.List;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Scanner;
-
-
-
 import com.db4o.*;
+import com.db4o.query.Query;
 
 public class DB4o {
 
@@ -54,11 +52,11 @@ public class DB4o {
 			case 3: modificarCliente(); break; //Hecho
 			case 4: anadirArticulo(); break; //Hecho
 			case 5: mostrarArticulos(); break; //Hecho
-			case 6: modificarArticulo(); break;
+			case 6: modificarArticulo(); break;//"HECHO"
 			case 7: reponerArticulo(); break; //Hecho
 			case 8: hacerVenta(); break;
 			case 9: anularVenta(); break;
-			case 10: articulosAreponer(); break;
+			case 10: articulosAreponer(); break; //"HECHO"
 			case 11: ventasRealizadas(); break;
 			case 12: ultimosClientes(); break;
 			case 13: ventasMasde50(); break;
@@ -91,8 +89,14 @@ public class DB4o {
 	}
 
 	private static void articulosAreponer() {
-		// TODO Auto-generated method stub
-		// Mostrará todos los artículos cuyo stock_actual es inferior al stock_minmo	
+		Object stock_minimo = 5;
+		Object stock_actual = 0;
+		// Mostrará todos los artículos cuyo stock_actual es inferior al stock_minmo
+			System.out.println("Estos articulos necesitan ser repuestos: ");
+			Query q = db.query();
+			q.constrain(Articulo.class);
+			q.descend("stock_actual").constrain(stock_minimo).smaller();
+			ObjectSet result = q.execute();
 	}
 
 	private static void anularVenta() {
@@ -101,8 +105,8 @@ public class DB4o {
 	}
 
 	private static void hacerVenta() {
-		// TODO Auto-generated method stub
-		// A partir de la fecha de hoy, pide dni de cliente, pide artículo y nº unidades quese venden. Hay que descontar el numero de unidades del stock. 
+		// A partir de la fecha de hoy, pide dni de cliente, pide artículo y nº unidades quese venden. Hay que descontar el numero de unidades del stock.
+
 	}
 
 	private static void reponerArticulo() {
@@ -128,7 +132,18 @@ public class DB4o {
 	}
 
 	private static void modificarArticulo() {
-		// TODO Auto-generated method stub
+		// Pedirá un codigo y pedirá nuevos datos para ese articulo.
+		String decripcion, cod_articulo;
+		System.out.println("Dime el codigo del artículo: ");
+		cod_articulo = teclado.next().toUpperCase();
+		if (existeArticulo(cod_articulo)) {
+			ObjectSet<Articulo> result = db.queryByExample(new Articulo());
+			Articulo articulo = result.next();
+			System.out.println("Dime la nueva descripcion: ");
+			articulo.setDescripcion(teclado.next());
+		} else {
+			System.out.println("No existe un producto con el código " + cod_articulo);
+		}
 	}
 
 	private static void mostrarArticulos() {
