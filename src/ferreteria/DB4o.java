@@ -74,8 +74,14 @@ public class DB4o {
 	} //final del MAIN()
 
 	private static void ventasMasde50() {
-		// TODO Auto-generated method stub
 		// Mostrará localidades de los clientes y los nombres de los clientes que han realizado una factura por un importe superior a 50€.
+		Query q = db.query();
+		q.constrain(Venta.class);
+		q.descend("unidades_vendidas*pvp_unidad").constrain(50).greater();
+		ObjectSet<Venta> result = q.execute();
+		while (result.hasNext()) {
+			System.out.println("Localidad: " + result.next().getCliente().getLocalidad() + " Nombre: " + result.next().getCliente().getNombre());
+		}
 	}
 
 	private static void ultimosClientes() {
@@ -84,8 +90,11 @@ public class DB4o {
 	}
 
 	private static void ventasRealizadas() {
-		// TODO Auto-generated method stub
 		// Mostrará las ventas realizadas
+		Query q = db.query();
+        q.constrain(Venta.class);
+        q.descend("venta").orderAscending();
+        ObjectSet result = q.execute();
 	}
 
 	private static void articulosAreponer() {
@@ -107,7 +116,7 @@ public class DB4o {
 	private static void hacerVenta() {
 		// A partir de la fecha de hoy, pide dni de cliente, pide artículo y nº unidades quese venden. Hay que descontar el numero de unidades del stock.
 		String dni,cod_articulo;
-		int unidadesCompra;
+		int unidadesVenta,pvp;
 		System.out.println("Dime el DNI del cliente: ");
 		dni = teclado.next().toUpperCase();
 		ObjectSet<Cliente> resultadoCliente = db.queryByExample(new Cliente(null, dni, null));
@@ -121,9 +130,14 @@ public class DB4o {
 				System.out.println("No existe el articulo con el codigo " + cod_articulo);
 			} else {
 				System.out.println("Dime las unidades que quieres comprar ");
-				unidadesCompra = Integer.parseInt(teclado.next());
+				unidadesVenta = Integer.parseInt(teclado.next());
+				System.out.println("Dime el PvP del artículo ");
+				pvp = Integer.parseInt(teclado.next());
 				Articulo articulo = resultadoArticulo.next();
-				articulo.setStock_actual(articulo.getStock_actual() - unidadesCompra);
+				articulo.setStock_actual(articulo.getStock_actual() - unidadesVenta);
+				Venta venta = new Venta(resultadoCliente.next(),articulo, unidadesVenta,pvp);
+				db.store(articulo);
+				db.store(venta);
 			}
 		}
 	}
